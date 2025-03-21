@@ -1,45 +1,228 @@
+from rest_framework import status, generics, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework.views import APIView
 
-from django.shortcuts import get_object_or_404
-
-from cinema.models import Movie
-from cinema.serializers import MovieSerializer
+from cinema.models import Genre, Actor, CinemaHall, Movie
+from cinema.serializers import (
+    GenreSerializer,
+    ActorSerializer,
+    CinemaHallSerializer,
+    MovieSerializer,
+)
 
 
 @api_view(["GET", "POST"])
-def movie_list(request):
-    if request.method == "GET":
-        movies = Movie.objects.all()
-        serializer = MovieSerializer(movies, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+def genre_list(request):
 
-    if request.method == "POST":
-        serializer = MovieSerializer(data=request.data)
+    if request.method == "GET":
+        genres = Genre.objects.all()
+        serializer = GenreSerializer(genres, many=True)
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        serializer = GenreSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(["GET", "PUT", "DELETE"])
-def movie_detail(request, pk):
-    movie = get_object_or_404(Movie, pk=pk)
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+def genre_detail(request, pk):
+
+    try:
+        genre = Genre.objects.get(pk=pk)
+    except Genre.DoesNotExist:
+        return Response(
+            {"error": "Genre not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
 
     if request.method == "GET":
-        serializer = MovieSerializer(movie)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = GenreSerializer(genre)
+        return Response(serializer.data)
 
-    if request.method == "PUT":
-        serializer = MovieSerializer(movie, data=request.data)
+    elif request.method == "PUT":
+        serializer = GenreSerializer(genre, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
+            return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    if request.method == "DELETE":
-        movie.delete()
+    elif request.method == "PATCH":
+        serializer = GenreSerializer(genre, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        genre.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ActorListView(generics.GenericAPIView):
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
+
+    def get(self, request):
+        actors = self.get_queryset()
+        serializer = self.get_serializer(actors, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ActorDetailView(generics.GenericAPIView):
+    queryset = Actor.objects.all()
+    serializer_class = ActorSerializer
+
+    def get_object(self):
+        try:
+            return Actor.objects.get(pk=self.kwargs["pk"])
+        except Actor.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        actor = self.get_object()
+        if not actor:
+            return Response(
+                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(actor)
+        return Response(serializer.data)
+
+    def put(self, request, pk):
+        actor = self.get_object()
+        if not actor:
+            return Response(
+                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(actor, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request, pk):
+        actor = self.get_object()
+        if not actor:
+            return Response(
+                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(
+            actor,
+            data=request.data,
+            partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        actor = self.get_object()
+        if not actor:
+            return Response(
+                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        actor.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# CinemaHall views using GenericViewSet
+class CinemaHallViewSet(viewsets.GenericViewSet):
+    queryset = CinemaHall.objects.all()
+    serializer_class = CinemaHallSerializer
+
+    def list(self, request):
+        """Get a list of all cinema halls"""
+        halls = self.get_queryset()
+        serializer = self.get_serializer(halls, many=True)
+        return Response(serializer.data)
+
+    def create(self, request):
+        """Create a new cinema hall"""
+        serializer = self.get_serializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def retrieve(self, request, pk=None):
+        """Get a specific cinema hall by ID"""
+        try:
+            hall = CinemaHall.objects.get(pk=pk)
+        except CinemaHall.DoesNotExist:
+            return Response(
+                {"error": "Cinema hall not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(hall)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        """Update a cinema hall completely"""
+        try:
+            hall = CinemaHall.objects.get(pk=pk)
+        except CinemaHall.DoesNotExist:
+            return Response(
+                {"error": "Cinema hall not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(hall, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        """Update a cinema hall partially"""
+        try:
+            hall = CinemaHall.objects.get(pk=pk)
+        except CinemaHall.DoesNotExist:
+            return Response(
+                {"error": "Cinema hall not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = self.get_serializer(hall, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        """Delete a cinema hall"""
+        try:
+            hall = CinemaHall.objects.get(pk=pk)
+        except CinemaHall.DoesNotExist:
+            return Response(
+                {"error": "Cinema hall not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        hall.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+# Movie views using ModelViewSet
+class MovieViewSet(viewsets.ModelViewSet):
+    """
+    A viewset for Movie instances that provides all standard actions:
+    list, create, retrieve, update, partial_update, destroy
+    """
+    queryset = Movie.objects.all()
+    serializer_class = MovieSerializer
