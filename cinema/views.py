@@ -84,60 +84,6 @@ class ActorDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
-    # def get_object(self):
-    #     try:
-    #         return Actor.objects.get(pk=self.kwargs["pk"])
-    #     except Actor.DoesNotExist:
-    #         return None
-    #
-    # def get(self, request, pk):
-    #     actor = self.get_object()
-    #     if not actor:
-    #         return Response(
-    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-    #         )
-    #
-    #     serializer = self.get_serializer(actor)
-    #     return Response(serializer.data)
-    #
-    # def put(self, request, pk):
-    #     actor = self.get_object()
-    #     if not actor:
-    #         return Response(
-    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-    #         )
-    #
-    #     serializer = self.get_serializer(actor, data=request.data)
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
-    #
-    # def patch(self, request, pk):
-    #     actor = self.get_object()
-    #     if not actor:
-    #         return Response(
-    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-    #         )
-    #
-    #     serializer = self.get_serializer(
-    #         actor,
-    #         data=request.data,
-    #         partial=True
-    #     )
-    #     serializer.is_valid(raise_exception=True)
-    #     serializer.save()
-    #     return Response(serializer.data)
-    #
-    # def delete(self, request, pk):
-    #     actor = self.get_object()
-    #     if not actor:
-    #         return Response(
-    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-    #         )
-    #
-    #     actor.delete()
-    #     return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # CinemaHall views using GenericViewSet
 class CinemaHallViewSet(viewsets.GenericViewSet):
