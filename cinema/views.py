@@ -64,79 +64,79 @@ class GenreDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ActorList(generics.GenericAPIView):
+class ActorList(generics.ListCreateAPIView):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
-    def get(self, request):
-        actors = self.get_queryset()
-        serializer = self.get_serializer(actors, many=True)
-        return Response(serializer.data)
+    # def get(self, request):
+    #     actors = self.get_queryset()
+    #     serializer = self.get_serializer(actors, many=True)
+    #     return Response(serializer.data)
+    #
+    # def post(self, request):
+    #     serializer = self.get_serializer(data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
-class ActorDetail(generics.GenericAPIView):
+class ActorDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
-    def get_object(self):
-        try:
-            return Actor.objects.get(pk=self.kwargs["pk"])
-        except Actor.DoesNotExist:
-            return None
-
-    def get(self, request, pk):
-        actor = self.get_object()
-        if not actor:
-            return Response(
-                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = self.get_serializer(actor)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        actor = self.get_object()
-        if not actor:
-            return Response(
-                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = self.get_serializer(actor, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def patch(self, request, pk):
-        actor = self.get_object()
-        if not actor:
-            return Response(
-                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        serializer = self.get_serializer(
-            actor,
-            data=request.data,
-            partial=True
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    def delete(self, request, pk):
-        actor = self.get_object()
-        if not actor:
-            return Response(
-                {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        actor.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    # def get_object(self):
+    #     try:
+    #         return Actor.objects.get(pk=self.kwargs["pk"])
+    #     except Actor.DoesNotExist:
+    #         return None
+    #
+    # def get(self, request, pk):
+    #     actor = self.get_object()
+    #     if not actor:
+    #         return Response(
+    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #
+    #     serializer = self.get_serializer(actor)
+    #     return Response(serializer.data)
+    #
+    # def put(self, request, pk):
+    #     actor = self.get_object()
+    #     if not actor:
+    #         return Response(
+    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #
+    #     serializer = self.get_serializer(actor, data=request.data)
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+    #
+    # def patch(self, request, pk):
+    #     actor = self.get_object()
+    #     if not actor:
+    #         return Response(
+    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #
+    #     serializer = self.get_serializer(
+    #         actor,
+    #         data=request.data,
+    #         partial=True
+    #     )
+    #     serializer.is_valid(raise_exception=True)
+    #     serializer.save()
+    #     return Response(serializer.data)
+    #
+    # def delete(self, request, pk):
+    #     actor = self.get_object()
+    #     if not actor:
+    #         return Response(
+    #             {"error": "Actor not found"}, status=status.HTTP_404_NOT_FOUND
+    #         )
+    #
+    #     actor.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # CinemaHall views using GenericViewSet
