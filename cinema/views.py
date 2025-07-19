@@ -23,6 +23,7 @@ class GenreListAPIView(APIView):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class GenreDetailAPIView(APIView):
     def get_object(self, pk):
         try:
