@@ -22,10 +22,9 @@ def genre_list(request):
 
     elif request.method == "POST":
         serializer = GenreSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["GET", "PUT", "PATCH", "DELETE"])
@@ -73,10 +72,9 @@ class ActorListView(generics.GenericAPIView):
 
     def post(self, request):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class ActorDetailView(generics.GenericAPIView):
@@ -154,10 +152,9 @@ class CinemaHallViewSet(viewsets.GenericViewSet):
     def create(self, request):
         """Create a new cinema hall"""
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def retrieve(self, request, pk=None):
         """Get a specific cinema hall by ID"""
